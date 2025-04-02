@@ -1,0 +1,28 @@
+CUDA_VISIBLE_DEVICES=0 python main_curriculum.py  --do_test \
+    --use_curri \
+    --use_gcn \
+    --use_gate \
+    --use_ltp \
+    --seed=50 \
+    --use_bayesian \
+    --use_data_level \
+    --dropout_times=3 \
+    --grow_steps=10 \
+    --u=1 \
+    --train_data_path=./sample_data/ctb5/train.txt \
+    --eval_data_path=./sample_data/ctb5/test.txt \
+    --test_data_path=./sample_data/ctb5/test.txt \
+    --decoder=softmax  \
+    --max_seq_length=160 \
+    --max_ngram_size=160 \
+    --train_batch_size=16 \
+    --eval_batch_size=16\
+    --num_train_epochs=50 \
+    --warmup_proportion=0.1 \
+    --learning_rate=2e-5 \
+    --ngram_num_threshold=2 \
+    --ngram_flag=av \
+    --av_threshold=2 \
+    --dataset_name=ctb5\
+    --voc=voc_train_dev_ngrams_jieba.txt \
+    --eval_model=./output/ctb5_/roberta/ctb5_BU/model.pt

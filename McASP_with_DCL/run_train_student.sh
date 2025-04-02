@@ -1,0 +1,31 @@
+#train stuent model with BU
+python main_dcl.py --do_train \
+    --use_curri \
+    --use_bayesian \
+    --u=1 \
+    --do_train \
+    --use_attention \
+    --use_data_level\
+    --dropout_times=3 \
+    --grow_steps=10 \
+    --use_bert \
+    --train_data_path=./sample_data/ctb5/train.txt \
+    --eval_data_path=./sample_data/ctb5/test.txt \
+    --test_data_path=./sample_data/ctb5/test.txt \
+    --bert_model=/ceph/home/hao01/tangxuemei/pre_trained_models/bert \
+    --decoder=softmax  \
+    --max_seq_length=160 \
+    --max_ngram_size=160 \
+    --train_batch_size=16 \
+    --eval_batch_size=16 \
+    --num_train_epochs=70 \
+    --warmup_proportion=0.1 \
+    --patient=100 \
+    --learning_rate=2e-5 \
+    --ngram_threshold=2 \
+    --cat_type=freq \
+    --ngram_type=pmi \
+    --av_threshold=2 \
+    --dataset_name=ctb5\
+    --voc=voc_train_dev_ngrams_jieba.txt \
+    --model_set=models/bert_BU

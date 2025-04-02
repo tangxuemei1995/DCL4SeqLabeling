@@ -1,0 +1,238 @@
+快速上手
+========
+
+快速安装
+-----------
+
+安装LTP是非常简单的，使用Pip安装只需要：
+
+.. code-block:: sh
+
+    pip install ltp
+
+载入模型
+--------------------------
+
+.. code-block:: python
+
+    from ltp import LTP
+    ltp = LTP() # 默认加载 Small 模型
+    # ltp = LTP(path = "base|small|tiny")
+    # ltp = LTP(path = "tiny.tgz|tiny-tgz-extracted") # 其中 tiny-tgz-extracted 是 tiny.tgz 解压出来的文件夹
+
+分句
+--------------------------
+
+使用LTP分句只需要调用ltp.sent_split函数
+
+.. code-block:: python
+
+    from ltp import LTP
+    ltp = LTP()
+    sents = ltp.sent_split(["他叫汤姆去拿外衣。", "汤姆生病了。他去了医院。"])
+
+    # [
+    #   "他叫汤姆去拿外衣。",
+    #   "汤姆生病了。",
+    #   "他去了医院。"
+    # ]
+
+用户自定义词典
+-------------------
+
+::
+
+    # user_dict.txt
+
+    负重前行
+    长江大桥
+
+.. code-block:: python
+
+    from ltp import LTP
+    ltp = LTP()
+    # user_dict.txt 是词典文件， max_window是最大前向分词窗口
+    ltp.init_dict(path="user_dict.txt", max_window=4)
+    # 也可以在代码中添加自定义的词语
+    ltp.add_words(words=["负重前行", "长江大桥"], max_window=4)
+
+
+分词
+------------------
+
+使用LTP分词非常简单，下面是一个简短的例子：
+
+.. code-block:: python
+
+    from ltp import LTP
+
+    ltp = LTP()
+
+    segment, _ = ltp.seg(["他叫汤姆去拿外衣。"])
+    # [['他', '叫', '汤姆', '去', '拿', '外衣', '。']]
+
+    # 对于已经分词的数据
+    segment, hidden = ltp.seg(["他/叫/汤姆/去/拿/外衣/。".split('/')], is_preseged=True)
+
+
+词性标注
+------------------
+
+.. code-block:: python
+
+    from ltp import LTP
+
+    ltp = LTP()
+
+    seg, hidden = ltp.seg(["他叫汤姆去拿外衣。"])
+    pos = ltp.pos(hidden)
+    # [['他', '叫', '汤姆', '去', '拿', '外衣', '。']]
+    # [['r', 'v', 'nh', 'v', 'v', 'n', 'wp']]
+
+命名实体识别
+------------------
+
+
+.. code-block:: python
+
+    from ltp import LTP
+
+    ltp = LTP()
+
+    seg, hidden = ltp.seg(["他叫汤姆去拿外衣。"])
+    ner = ltp.ner(hidden)
+    # [['他', '叫', '汤姆', '去', '拿', '外衣', '。']]
+    # [[('Nh', 2, 2)]]
+
+    tag, start, end = ner[0][0]
+    print(tag,":", "".join(seg[0][start:end + 1]))
+    # Nh : 汤姆
+
+
+
+语义角色标注
+------------------
+
+.. code-block:: python
+
+    from ltp import LTP
+
+    ltp = LTP()
+
+    seg, hidden = ltp.seg(["他叫汤姆去拿外衣。"])
+    srl = ltp.srl(hidden)
+    # [['他', '叫', '汤姆', '去', '拿', '外衣', '。']]
+    # [
+    #     [
+    #         [],                                                # 他
+    #         [('ARG0', 0, 0), ('ARG1', 2, 2), ('ARG2', 3, 5)],  # 叫 -> [ARG0: 他, ARG1: 汤姆, ARG2: 去拿外衣]
+    #         [],                                                # 汤姆
+    #         [],                                                # 去
+    #         [('ARG0', 2, 2), ('ARG1', 5, 5)],                  # 拿 -> [ARG0: 汤姆, ARG1: 外衣]
+    #         [],                                                # 外衣
+    #         []                                                 # 。
+    #     ]
+    # ]
+    srl = ltp.srl(hidden, keep_empty=False)
+    # [
+    #     [
+    #         (1, [('ARG0', 0, 0), ('ARG1', 2, 2), ('ARG2', 3, 5)]), # 叫 -> [ARG0: 他, ARG1: 汤姆, ARG2: 去拿外衣]
+    #         (4, [('ARG0', 2, 2), ('ARG1', 5, 5)])                  # 拿 -> [ARG0: 汤姆, ARG1: 外衣]
+    #     ]
+    # ]
+
+
+
+依存句法分析
+------------------
+
+需要注意的是，在依存句法当中，虚节点ROOT占据了0位置，因此节点的下标从1开始。
+
+.. code-block:: python
+
+    from ltp import LTP
+
+    ltp = LTP()
+
+    seg, hidden = ltp.seg(["他叫汤姆去拿外衣。"])
+    dep = ltp.dep(hidden)
+    # [['他', '叫', '汤姆', '去', '拿', '外衣', '。']]
+    # [
+    #     [
+    #         (1, 2, 'SBV'),
+    #         (2, 0, 'HED'),    # 叫 --|HED|--> ROOT
+    #         (3, 2, 'DBL'),
+    #         (4, 2, 'VOB'),
+    #         (5, 4, 'COO'),
+    #         (6, 5, 'VOB'),
+    #         (7, 2, 'WP')
+    #     ]
+    # ]
+
+
+
+语义依存分析(树)
+------------------
+
+与依存句法类似的，这里的下标也是从1开始。
+
+.. code-block:: python
+
+    from ltp import LTP
+
+    ltp = LTP()
+
+    seg, hidden = ltp.seg(["他叫汤姆去拿外衣。"])
+    sdp = ltp.sdp(hidden, mode='tree')
+    # [['他', '叫', '汤姆', '去', '拿', '外衣', '。']]
+    # [
+    #     [
+    #         (1, 2, 'Agt'),
+    #         (2, 0, 'Root'),   # 叫 --|Root|--> ROOT
+    #         (3, 2, 'Datv'),
+    #         (4, 2, 'eEfft'),
+    #         (5, 4, 'eEfft'),
+    #         (6, 5, 'Pat'),
+    #         (7, 2, 'mPunc')
+    #     ]
+    # ]
+
+
+语义依存分析(图)
+------------------
+
+与依存句法类似的，这里的下标也是从1开始。
+
+.. code-block:: python
+
+    from ltp import LTP
+
+    ltp = LTP()
+
+    seg, hidden = ltp.seg(["他叫汤姆去拿外衣。"])
+    sdp = ltp.sdp(hidden, mode='graph')
+    # [['他', '叫', '汤姆', '去', '拿', '外衣', '。']]
+    # [
+    #     [
+    #         (1, 2, 'Agt'),
+    #         (2, 0, 'Root'),   # 叫 --|Root|--> ROOT
+    #         (3, 2, 'Datv'),
+    #         (3, 4, 'Agt'),
+    #         (3, 5, 'Agt'),
+    #         (4, 2, 'eEfft'),
+    #         (5, 4, 'eEfft'),
+    #         (6, 5, 'Pat'),
+    #         (7, 2, 'mPunc')
+    #     ]
+    # ]
+
+
+LTP Server
+------------------------------
+
+LTP Server 是对 LTP 的一个简单包装，依赖于 tornado，使用方式如下：
+
+.. code-block:: bash
+
+    pip install ltp, tornado
+    python utils/server.py serve
