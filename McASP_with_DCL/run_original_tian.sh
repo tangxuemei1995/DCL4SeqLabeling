@@ -5,7 +5,7 @@ python main_dcl.py --do_train \
     --use_attention \
     --use_bert \
     --train_data_path=./sample_data/ctb5/train.txt \
-    --eval_data_path=./sample_data/ctb5/test.txt \
+    --eval_data_path=./sample_data/ctb5/dev.txt \
     --test_data_path=./sample_data/ctb5/test.txt \
     --bert_model=./base_model/bert \
     --decoder=softmax  \

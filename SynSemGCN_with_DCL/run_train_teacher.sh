@@ -4,7 +4,7 @@
 CUDA_VISIBLE_DEVICES=0 python  main_baseline.py \
     --do_train \
     --train_data_path=./sample_data/ctb5/train.txt \
-    --eval_data_path=./sample_data/ctb5/test.txt \
+    --eval_data_path=./sample_data/ctb5/dev.txt \
     --bert_model=./base_model/bert \
     --decoder=softmax  \
     --max_seq_length=160 \
